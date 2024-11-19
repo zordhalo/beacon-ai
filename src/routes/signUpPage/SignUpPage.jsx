@@ -4,12 +4,10 @@ import './signUpPage.css'
 
 const SignUpPage = () => {
   return (
-    <div className='signUpPage'>
-      
+    <div className="signUpPage">
       <SignUp path="/sign-up" />
-
     </div>
   )
 }
 
-export default SignUpPage
+export default SignUpPage;
