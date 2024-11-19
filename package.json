@@ -1,31 +1,29 @@
 {
-  "name": "chatgpt-clone",
+  "name": "zaither",
   "version": "1.0.0",
-  "description": "A clone of ChatGPT",
+  "description": "Ai Therapist Chatbot",
   "main": "main.jsx",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "chatgpt",
-    "clone",
+    "therapist",
+    "ai",
     "chatbot"
   ],
   "author": "Lucas Krawczak",
   "license": "",
   "dependencies": {
-    "express": "^4.17.1",
+    "@clerk/clerk-react": "^5.16.0",
+    "@vitejs/plugin-react": "^4.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.28.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.0",
-    "vite": "^5.0.0"
+    "react-router-dom": "^6.28.0",
+    "sass": "^1.81.0",
+    "vite": "^5.4.11"
   }
 }
