@@ -19,6 +19,7 @@
   "license": "",
   "dependencies": {
     "@clerk/clerk-react": "^5.16.0",
+    "@clerk/themes": "^2.1.45",
     "@vitejs/plugin-react": "^4.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

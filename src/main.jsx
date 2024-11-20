@@ -10,6 +10,7 @@ import DashboardPage from './routes/dashboardPage/DashboardPage'
 import SignInPage from './routes/signInPage/SignInPage'
 import SignUpPage from './routes/signUpPage/SignUpPage'
 
+
 const router = createBrowserRouter([
   {
     element: <RootLayout/>,

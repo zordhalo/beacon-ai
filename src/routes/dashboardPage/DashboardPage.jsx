@@ -2,7 +2,7 @@ import './dashboardPage.css'
 
 const DashBoardPage = () => {
   return (
-    <div className='dashBoardPage'>DashBoardPage</div>
+    <div className='dashBoardPage'>DashboardPage</div>
   )
 }
 
