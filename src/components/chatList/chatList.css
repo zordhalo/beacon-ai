@@ -1,21 +1,25 @@
 .chatList{
+    font-size: 0.875rem;
+    padding: 0.625rem;
     display: flex;
     flex-direction: column;
     height: 100%;
+}
 
 hr{
     border:none;
-    height: 2px;
+    height: 0.125rem;
     background-color: #ddd;
     opacity: 0.1;
-    border-radius: 5px;
-    margin: 20px 0px;
+    border-radius: 0.3125rem;
+    margin: 1.25rem 0px;
 }
 
 .title{
+    font-size: 0.9rem;
     font-weight: 600;
-    font-style: 10px;
-    margin-bottom: 10px;
+    font-style: 0.625rem;
+    margin-bottom: 0.625rem;
 }
 
 .list {
@@ -30,13 +34,13 @@ hr{
 
 /* For Webkit browsers (Chrome, Safari, Edge) */
 .list::-webkit-scrollbar {
-    width: 8px;
+    width: 0.5rem;
     background-color: transparent;
 }
 
 .list::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    border-radius: 0.25rem;
 }
 
 .list::-webkit-scrollbar-track {
@@ -49,8 +53,8 @@ hr{
 }
 
 a{
-    padding: 10px;
-    border-radius: 10px;
+    padding: 0.625rem;
+    border-radius: 0.625rem;
 
     &:hover{
         background-color: #2c2937;
@@ -61,12 +65,12 @@ a{
     margin-top: auto;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 12px;
+    gap: 0.625rem;
+    font-size: 0.75rem;
 
     img{
-        width: 24px;
-        height: 24px;
+        width: 1.5rem;
+        height: 1.5rem;
     }
 
     .texts{
@@ -79,10 +83,9 @@ a{
             }
 
             &:last-child{
-                font-size: 10px;
+                font-size: 0.625rem;
                 color: #888;
             }
         }
     }
-}
 }
