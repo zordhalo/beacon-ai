@@ -1,6 +1,9 @@
+import { useRef } from 'react'
 import './chatPage.css'
  
 const ChatPage = () => {
+
+  const endRef = useRef(null)
   return (
     <div className='chatPage'>
       <div className="wrapper">
@@ -25,7 +28,7 @@ const ChatPage = () => {
         <div className="message user">Test Message from user</div>
         <div className="message">Text message from ai</div>
         <div className="message user">Test Message from user</div>
-
+        <div ref={endRef}/>
         </div>
       </div>
     </div>
