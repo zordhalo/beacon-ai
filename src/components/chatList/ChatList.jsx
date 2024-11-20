@@ -20,8 +20,6 @@ const ChatList = () => {
             <Link to="/">My Chat title</Link>
             <Link to="/">My Chat title</Link>
             <Link to="/">My Chat title</Link>
-            <Link to="/">My Chat title</Link>
-            <Link to="/">My Chat title</Link>
         </div>
         <hr/>
         <div className="upgrade">

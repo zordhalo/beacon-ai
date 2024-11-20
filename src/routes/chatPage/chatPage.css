@@ -1,0 +1,55 @@
+.chatPage {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .wrapper {
+        flex: 1;
+        overflow: scroll;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        
+        /* For Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+
+        /* For Webkit browsers (Chrome, Safari, Edge) */
+        &::-webkit-scrollbar {
+            width: 8px;
+            background-color: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Make scrollbar visible only on hover */
+        &:not(:hover)::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+
+        .chat {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+        
+            .message {
+                padding: 20px;
+
+                &.user {
+                    background-color: #2c2937;
+                    border-radius: 20px;
+                    max-width: 80%;
+                    align-self: flex-end;
+                }
+            }
+        }
+    }
+}
