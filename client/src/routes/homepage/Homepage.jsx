@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import './homepage.css';
 
 const Homepage = () => {
-
     return (
         <div className='homepage'>
 <img src="/orbital.png" alt="" className="orbital" />
