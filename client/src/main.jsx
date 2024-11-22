@@ -31,8 +31,8 @@ const router = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           {
-        path: "/dashboard",
-        element: <DashboardPage />,
+            path: "/dashboard",
+            element: <DashboardPage />,
           },
           {
             path:"/dashboard/chats/:id",

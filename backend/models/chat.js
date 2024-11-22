@@ -5,24 +5,19 @@ const chatSchema = new mongoose.Schema({
     type: String,
     required: true,
     },
+    title: {
+        type: String,
+        required: true,
+    },
     history:[
         {
-            role:{
+            question:{
                 type: String,
-                enum: ["user", "model"],
                 required: true,
             },
-            parts:[
-                {
-                    text:{
-                    type: String,
-                    required: true,
-                    },
-                },
-            ],
-            img:{
+            answer:{
                 type: String,
-                required: false,
+                required: true,
             },
         }
     ]

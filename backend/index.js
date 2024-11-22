@@ -2,10 +2,10 @@ import express from "express";
 import cors from "cors";
 import ImageKit from "imagekit";
 import mongoose from "mongoose";
-import Chat from "./models/Chat.js";
-import UserChats from "./models/UserChats.js";
+import Chat from "./models/chat.js";
+import UserChats from "./models/userChats.js";
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
-
+import { OpenAI } from "openai";  // Add this import
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -52,48 +52,75 @@ app.get("/api/test", ClerkExpressRequireAuth(), (req, res) =>
 });*/
 
 // ROUTES FOR CHATS INCLUDING AUTHENTICATION
-app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
-  const { text } = req.body;
+const openai = new OpenAI({
+  apiKey: process.env.SAMBANOVA_API_KEY,
+  baseURL: process.env.SAMBANOVA_API_URL
+});
 
+app.post("/api/chat", ClerkExpressRequireAuth(), async (req, res) => {
   try {
-    // CREATE A NEW CHAT
-    const newChat = new Chat({
-      userId: userId,
-      history: [{ role: "user", parts: [{ text }] }],
-    });
-    // SAVE CHAT TO DATABASE
-    const savedChat = await newChat.save();
-
-    // CHECK if user chats exist
-    const userChats = await UserChats.findOne({ userId: userId });
-
-    if (!userChats) {
-      // CREATE A NEW USER CHAT
-      const newUserChats = new UserChats({
-        userId: userId,
-        chats: [
-          {
-            _id: savedChat._id,
-            title: text.substring(0, 40),
-          },
-        ],
-      });
-      // SAVE USER CHATS TO DATABASE
-      await newUserChats.save();
-    } else {
-      // ADD NEW CHAT TO EXISTING CHATS
-      userChats.chats.push({
-        _id: savedChat._id,
-        title: text.substring(0, 40),
-      });
-      await userChats.save();
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    res.status(200).send({ id: newChat._id });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error saving chat");
+    const completion = await openai.completions.create({
+      model: "Meta-Llama-3.1-70B-Instruct",
+      prompt: prompt,
+      max_tokens: 300,
+      temperature: 0.7,
+      // Add timeout handling
+      timeout: 30000
+    });
+
+    res.json({ answer: completion.choices[0].text });
+  } catch (error) {
+    console.error('OpenAI API Error:', error);
+    res.status(500).json({ 
+      error: error.message,
+      details: error.response?.data || 'Unknown error'
+    });
+  }
+});
+
+app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
+  try {
+    const { title, history } = req.body;
+    const userId = req.auth.userId;
+
+    // Validate required fields
+    if (!title || !history || !history.length) {
+      return res.status(400).json({ error: "Missing required chat data" });
+    }
+
+    // Create new chat
+    const chat = new Chat({
+      userId,
+      title,
+      history
+    });
+
+    const savedChat = await chat.save();
+
+    // Add to user's chat list
+    await UserChats.updateOne(
+      { userId },
+      { 
+        $push: { 
+          chats: { 
+            _id: savedChat._id, 
+            title: savedChat.title,
+            createdAt: new Date() 
+          } 
+        } 
+      },
+      { upsert: true }
+    );
+
+    res.status(201).json(savedChat);
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    res.status(500).json({ error: "Failed to create chat" });
   }
 });
 
@@ -115,15 +142,23 @@ app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
 {/* GET SINGLE CHAT HISTORY*/ }
 app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
+  const chatId = req.params.id;
+
+  if (!chatId) {
+    return res.status(400).json({ error: "Chat ID is required" });
+  }
 
   try {
-    const chat = await Chat.findOne({_id:req.params.id, userId});
+    const chat = await Chat.findOne({ _id: chatId, userId });
+    
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
 
-  res.status(200).send(chat);
-
+    res.status(200).json(chat);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Error fetching chat");
+    console.error("Error fetching chat:", err);
+    res.status(500).json({ error: "Error fetching chat" });
   }
 });
 
