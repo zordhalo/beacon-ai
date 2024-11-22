@@ -1,6 +1,5 @@
 import "./dashboardPage.css";
 import { useAuth } from "@clerk/clerk-react"
-import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
 

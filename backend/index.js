@@ -13,8 +13,8 @@ const app = express();
 // MIDDLEWARES
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
+    origin: process.env.CLIENT_URL, 
+    credentials: true, // allows session cookies to be sent back and forth
   })
 );
 
@@ -28,8 +28,7 @@ const connect = async () => {
     console.log("Connected to MongoDB");
   } catch (err) {
     console.log(err);
-  }
-};
+  }};
 
 // ROUTES FOR IMAGE UPLOAD
 const imagekit = new ImageKit({
@@ -37,14 +36,25 @@ const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
 });
+// GET AUTHENTICATION PARAMETERS FOR IMAGE UPLOAD
 app.get("/api/upload", (req, res) => {
   const result = imagekit.getAuthenticationParameters();
   res.send(result);
 });
 
-// ROUTES FOR CHATS
-app.post("/api/chats", async (req, res) => {
-  const { userId, text } = req.body;
+/*
+// Clerk Test Route
+app.get("/api/test", ClerkExpressRequireAuth(), (req, res) => 
+  {
+    const userId = req.auth.userId;
+  res.send("Hello World");
+  console.log(userId);
+});*/
+
+// ROUTES FOR CHATS INCLUDING AUTHENTICATION
+app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+  const { text } = req.body;
 
   try {
     // CREATE A NEW CHAT
@@ -92,6 +102,27 @@ app.post("/api/chats", async (req, res) => {
     console.error(err);
     res.status(500).send("Error saving chat");
   }
+});
+
+app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+
+  try {
+    const userChats = await UserChats.find({ userId});
+
+  res.status(200).send(userChats[0].chats);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching username");
+  }
+
+});
+
+{/* CLERK ERROR HANDLING*/}
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(401).send("Unauthorized");
 });
 
 // ROUTES FOR CHAT HISTORY

@@ -1,7 +1,10 @@
-import { Link } from 'react-router-dom';
 import './homepage.css';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+
 
 const Homepage = () => {
+    const[typingStatus, setTypingStatus] = useState("human1");
 
     return (
         <div className='homepage'>
@@ -11,6 +14,7 @@ const Homepage = () => {
         <h2>AI powered support at your fingertips.</h2>
         <h3>Your AI Companion for Mental Wellness: Empathetic, Available 24/7</h3>
             <Link to="/dashboard">Get Started</Link>
+
            </div>
            <div className="right">
             <div className="imgContainer">
