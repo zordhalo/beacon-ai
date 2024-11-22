@@ -37,16 +37,13 @@ hr{
     width: 0.5rem;
     background-color: transparent;
 }
-
 .list::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 0.25rem;
 }
-
 .list::-webkit-scrollbar-track {
     background: transparent;
 }
-
 /* Make scrollbar visible only on hover */
 .list:not(:hover)::-webkit-scrollbar-thumb {
     background: transparent;
