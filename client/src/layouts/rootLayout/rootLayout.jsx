@@ -20,9 +20,7 @@ const RootLayout = () => {
     appearance={{
       baseTheme: dark,
     }}>
-
           <QueryClientProvider client={queryClient}>
-
 
     <div className='rootLayout'>
         <header>

@@ -1,7 +1,7 @@
 {
-  "name": "zaither",
+  "name": "beacon-ai",
   "version": "1.0.0",
-  "description": "Ai Therapist Chatbot",
+  "description": "Beacon.ai is a therapist chatbot that uses AI to help you with your mental health.",
   "main": "main.jsx",
   "type": "module",
   "scripts": {
