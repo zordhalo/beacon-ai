@@ -5,7 +5,7 @@ const Homepage = () => {
 
     return (
         <div className='homepage'>
-<img src="/orbital.png" alt="" className="orbital" />
+    <img src="/orbital.png" alt="" className="orbital" />
            <div className="left">
         <h1>Beacon.ai</h1>
         <h2>AI powered support at your fingertips.</h2>
@@ -30,4 +30,5 @@ const Homepage = () => {
         </div>
     )
 }
+
 export default Homepage;
