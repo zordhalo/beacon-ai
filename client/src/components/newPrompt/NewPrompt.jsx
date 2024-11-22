@@ -75,8 +75,8 @@ const NewPrompt = ({ data }) => {
     },
   });
 
-  const add = async (text) => {
-    setQuestion(text);
+  const add = async (text, isInitial) => {
+    if (!isInitial) setQuestion(text);
 
     try {
       const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
@@ -89,7 +89,6 @@ const NewPrompt = ({ data }) => {
         setAnswer(accumulatedText);
       }
       
-      // Only mutate after streaming is complete
       mutation.mutate();
 
     } catch (error) {
@@ -103,8 +102,14 @@ const NewPrompt = ({ data }) => {
     const text = e.target.text.value;
     if (!text) return;
 
-    add(text);
+    add(text,false);
   };
+
+  useEffect(() => {
+    if(data?.history?.length === 1) {
+      add(data.history[0].parts[0].text, true);
+    }
+  }, []);
 
   return (
     <>
@@ -120,7 +125,7 @@ const NewPrompt = ({ data }) => {
       {answer && <div className='message'><Markdown>{answer}</Markdown></div>}
 
       <div className="endChat" ref={endRef}></div>
-      <form className="newForm" onSubmit={handleSubmit}>
+      <form className="newForm" onSubmit={handleSubmit} ref = {formRef}>
         <Upload setImg={setImg} />
         <input id="file" type="file" multiple={false} hidden />
         <input type="text" name="text" placeholder="Ask anything..." />

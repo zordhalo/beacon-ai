@@ -8,7 +8,6 @@ import React from 'react';
 
 const ChatPage = () => {
 
-
   const path = useLocation().pathname;
   const chatId = path.split("/").pop();
 
