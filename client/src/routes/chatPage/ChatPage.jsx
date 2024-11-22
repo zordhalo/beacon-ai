@@ -1,12 +1,11 @@
-import './chatPage.css'
-import NewPrompt from '../../components/newPrompt/NewPrompt'
-import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
-import Markdown from 'react-markdown';
+import "./chatPage.css";
+import NewPrompt from "../../components/newPrompt/NewPrompt";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
+import Markdown from "react-markdown";
+import { IKImage } from "imagekitio-react";
 
 const ChatPage = () => {
-
-
   const path = useLocation().pathname;
   const chatId = path.split("/").pop();
 
@@ -18,48 +17,45 @@ const ChatPage = () => {
       }).then((res) => res.json()),
   });
 
-console.log(data);
+  console.log(data);
 
   return (
     <div className="chatPage">
       <div className="wrapper">
         <div className="chat">
-          <div className="message">Test message from ai</div>
-
-          {isPending 
+          {isPending
             ? "Loading..."
             : error
             ? "Something went wrong!"
-
             : data?.history?.map((message, i) => (
-              <>
-                {message.img && (
-                  <div className="message image">
-                    <img src={message.img} alt="img" />
+                <>
+                  {message.img && (
                     <IKImage
                       urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
                       path={message.img}
-                      height={300}
-                      width={400}
-                      transformation={[{ width: 400, height: 300 }]}
-                      loading="lazy"      // Lazy Loading
-                      lqip={{ active: true, quality: 20 }}  // Low Quality Image Placeholder
+                      height="300"
+                      width="400"
+                      transformation={[{ height: 300, width: 400 }]}
+                      loading="lazy"
+                      lqip={{ active: true, quality: 20 }}
                     />
+                  )}
+                  <div
+                    className={
+                      message.role === "user" ? "message user" : "message"
+                    }
+                    key={i}
+                  >
+                    <Markdown>{message.parts[0].text}</Markdown>
                   </div>
-                )}
+                </>
+              ))}
 
-                <div className={message.role === "user" ? "message user" : "message"} 
-                key={i} >
-                  <Markdown>{message.parts[0].text}</Markdown>
-                </div>
-              </>
-            ))
-          }
-          <NewPrompt />
+          {data && <NewPrompt data={data}/>}
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default ChatPage
+export default ChatPage;
