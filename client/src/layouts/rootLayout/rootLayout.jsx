@@ -11,6 +11,7 @@ if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key")
 }
 
+
 const queryClient = new QueryClient()
 
 const RootLayout = () => {

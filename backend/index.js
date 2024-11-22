@@ -122,18 +122,12 @@ app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
 {/* GET SINGLE CHAT HISTORY*/ }
 app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
-  const chatId = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(chatId)) {
-    return res.status(400).send("Invalid chat ID");
-  }
 
   try {
-    const chat = await Chat.findOne({ _id: chatId, userId });
-    if (!chat) {
-      return res.status(404).send("Chat not found");
-    }
-    res.status(200).send(chat);
+    const chat = await Chat.findOne({_id:req.params.id, userId});
+
+  res.status(200).send(chat);
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Error fetching chat");
