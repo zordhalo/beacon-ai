@@ -22,40 +22,41 @@ const ChatPage = () => {
 
 console.log(data);
 
+  if (isPending) {
+    return <div className="chatPage">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="chatPage">Error: {error.message}</div>;
+  }
+
   return (
     <div className="chatPage">
       <div className="wrapper">
         <div className="chat">
           <div className="message"></div>
 
-          {isPending 
-            ? "Loading..."
-            : error
-            ? "Something went wrong!"
-
-            : data?.history?.map((message, i) => (
-              <React.Fragment key={i}>
-                {message.img && (
-                  <div className="message image">
-                    <img src={message.img} alt="img" />
-                    <IKImage
-                      urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
-                      path={message.img}
-                      height={300}
-                      width={400}
-                      transformation={[{ width: 400, height: 300 }]}
-                      loading="lazy"      // Lazy Loading
-                      lqip={{ active: true, quality: 20 }}  // Low Quality Image Placeholder
-                    />
-                  </div>
-                )}
-
-                <div className={message.role === "user" ? "message user" : "message"}>
-                  <Markdown>{message.parts[0].text}</Markdown>
+          {data?.history?.map((message, i) => (
+            <React.Fragment key={i}>
+              {message.img && (
+                <div className="message image">
+                  <IKImage
+                    urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+                    path={message.img}
+                    height={300}
+                    width={400}
+                    transformation={[{ width: 400, height: 300 }]}
+                    loading="lazy"      // Lazy Loading
+                    lqip={{ active: true, quality: 20 }}  // Low Quality Image Placeholder
+                  />
                 </div>
-              </React.Fragment>
-            ))
-          }
+              )}
+
+              <div className={message.role === "user" ? "message user" : "message"}>
+                <Markdown>{message.parts[0].text}</Markdown>
+              </div>
+            </React.Fragment>
+          ))}
           <NewPrompt data={data}/>
         </div>
       </div>

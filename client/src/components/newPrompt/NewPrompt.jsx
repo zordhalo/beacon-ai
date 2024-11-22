@@ -1,56 +1,46 @@
-import './newPrompt.css'
+import './newPrompt.css';
 import Upload from '../upload/Upload';
 import model from '../../lib/gemini';
 import Markdown from 'react-markdown';
-
-  {/* IMPORT IMAGE KIT*/}
 import { IKContext, IKImage } from 'imagekitio-react';
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { set } from 'mongoose';
+import PropTypes from 'prop-types';
 
+const INITIAL_CHAT_HISTORY = [
+  {
+    role: "user",
+    parts: [{ text: "Hello" }],
+  },
+  {
+    role: "model",
+    parts: [{ text: "Great to meet you. What would you like to know?" }],
+  },
+];
 
+const INITIAL_IMG_STATE = {
+  isLoading: false,
+  error: "",
+  dbData: {},
+  aiData: {},
+};
 
-const NewPrompt = ({data}) => {
+const NewPrompt = ({ data }) => {
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [img, setImg] = useState(INITIAL_IMG_STATE);
+  const endRef = useRef(null);
+  const queryClient = useQueryClient();
 
-      {/* STATE FOR QUESTION AND ANSWER*/}
-      const [question, setQuestion] = useState("");
-      const [answer, setAnswer] = useState("");
+  const chat = model.startChat({
+    history: INITIAL_CHAT_HISTORY,
+    generationConfig: {}
+  });
 
-      {/* IMAGE UPLOAD STATE FOR UPLOAD COMPONENT*/}
-      const [img, setImg] = useState(
-        {
-        isLoading: false,
-        error:"",
-        dbData:{},
-        aiData:{},
-        })
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [question, answer, img.dbData]);
 
-      const chat = model.startChat({
-        history: [
-          {
-            role: "user",
-            parts: [{ text: "Hello" }],
-          },
-          {
-            role: "model",
-            parts: [{ text: "Great to meet you. What would you like to know?" }],
-          },
-        ],
-        generationConfig: {
-          //maxOutputTokens: 100,
-     } });
-
-    {/* SCROLL TO BOTTOM OF CHAT*/}
-    const endRef = useRef(null)
-    useEffect(() => {
-      endRef.current.scrollIntoView({ behavior: "smooth" })
-    }, [question, answer, img.dbData]);  {/* SCROLL WHEN QUESTION, ANSWER OR IMAGE IS ADDED*/}
-
-    
-const queryClient = useQueryClient();
-
-  {/* QUERY CLIENT FOR CHAT HOOKS AND ROUTING*/}
   const mutation = useMutation({
     mutationFn: () => {
       return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
@@ -67,87 +57,75 @@ const queryClient = useQueryClient();
       }).then((res) => res.json());
     },
     onSuccess: () => {
-      //invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
         setQuestion("");
         setAnswer("");
-        setImg({
-          isLoading: false,
-          error:"",
-          dbData:{},
-          aiData:{},
-        });
-        });
-      },
-      onError: (error) => {
-        console.log("Error adding conversation:", error);
-      },
-    });
+        setImg(INITIAL_IMG_STATE);
+      });
+    },
+    onError: (error) => {
+      console.log("Error adding conversation:", error);
+    },
+  });
 
-    {/* GENERATE CONTENT FROM MODEL*/}  
-    const add = async (text) => {
-        {/* SETS QUESTION*/}
-        setQuestion(text);
+  const add = async (text) => {
+    setQuestion(text);
 
-    try{
-        {/* CHECKS FOR IMAGE DATA*/}
-        const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
-        const result = await chat.sendMessageStream(payload);
+    try {
+      const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
+      const result = await chat.sendMessageStream(payload);
 
-        {/* SETS ANSWER*/} 
-        let accumulatedText = "";
-        for await (const chunk of result.stream) 
-        {
+      let accumulatedText = "";
+      for await (const chunk of result.stream) {
         const chunkText = chunk.text();
         console.log(chunkText);
         accumulatedText += chunkText;
         setAnswer(accumulatedText);
-        }
-        
-        mutation.mutate(text);
-      } catch (error) {
-        console.error("Error generating content:", error); 
       }
 
-  {/* HANDLE FORM SUBMISSION*/}
+      mutation.mutate(text);
+    } catch (error) {
+      console.error("Error generating content:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
-  e.preventDefault()
+    e.preventDefault();
 
-  const text = e.target.text.value;
-  if(!text) return;
+    const text = e.target.text.value;
+    if (!text) return;
 
-  add(text);
-}
+    add(text);
+  };
 
-{/* RENDER COMPONENTS AND FORM*/}
-      return (
-        <>
-        {/* ADD NEW CHAT*/}
-        {img.dbData?.filePath && (
-          <IKImage
+  return (
+    <>
+      {img.dbData?.filePath && (
+        <IKImage
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
           path={img.dbData?.filePath}
           width={380}
           transformation={[{ width: 200 }]}
-          />
-        )}
-        {/* SENDS QUESTION TO MODEL*/}
-        {question && <div className='message user'>{question}</div>}
-        {answer && <div className='message'><Markdown>{answer}</Markdown></div>}
+        />
+      )}
+      {question && <div className='message user'>{question}</div>}
+      {answer && <div className='message'><Markdown>{answer}</Markdown></div>}
 
-        {/* FORM TO SEND NEW QUESTION*/}
-        <div className="endChat" ref={endRef}></div>
-          <form className="newForm" onSubmit={handleSubmit}>
-            <Upload setImg={setImg}/>
-          <input id="file" type="file" multiple={false} hidden />
-          <input type="text" name="text" placeholder="Ask anything..." />
-          <button>
-            <img src="/arrow.png" alt="" /> 
-          </button>
-        </form> 
+      <div className="endChat" ref={endRef}></div>
+      <form className="newForm" onSubmit={handleSubmit}>
+        <Upload setImg={setImg} />
+        <input id="file" type="file" multiple={false} hidden />
+        <input type="text" name="text" placeholder="Ask anything..." />
+        <button>
+          <img src="/arrow.png" alt="" />
+        </button>
+      </form>
+    </>
+  );
+};
 
-      </>
-      )
-    } 
+NewPrompt.propTypes = {
+  data: PropTypes.object.isRequired
+};
 
 export default NewPrompt;
