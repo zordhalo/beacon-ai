@@ -1,9 +1,10 @@
 import { IKContext, IKUpload } from "imagekitio-react";
 
+
 const urlEndpoint = import.meta.env.VITE_IMAGE_KIT_ENDPOINT;
 const publicKey = import.meta.env.VITE_IMAGE_KIT_PUBLIC_KEY;
 
-const authenticator = async () => {
+const authenticator = async (setImg) => {
   try {
     const response = await fetch("http://localhost:3000/api/upload");
 
@@ -13,13 +14,14 @@ const authenticator = async () => {
     }
     const data = await response.json();
     const { signature, expire, token } = data;
-    return {signature, expire, token} = data;
+    return { signature, expire, token };
+    
   } catch (error) {
     throw new Error(`Authentication request failed: ${error.message}`);
   }
 };
 
-const Upload = () => {
+const Upload = ({setImg}) => {
 
     const onError = (err) => {
       console.log("Error", err);
@@ -27,6 +29,7 @@ const Upload = () => {
   
     const onSuccess = (res) => {
       console.log("Success", res);
+      setImg((prev) => ({...prev, isLoading: false, dbData: res}))
     };
   
     const onUploadProgress = (progress) => {
@@ -35,22 +38,25 @@ const Upload = () => {
   
     const onUploadStart = (evt) => {
      console.log("Start", evt);
+     setImg((prev) => ({...prev, isLoading: true}))
     };
 
-  <IKContext
-  urlEndpoint={urlEndpoint}
-  publicKey={publicKey}
-  authenticator={authenticator}
-  >
-    <IKUpload
-    fileName="example.png"
-    onError={onError}
-    onSuccess={onSuccess}
-    useUniqueFileName={true}
-    onUploadProgress={onUploadProgress}
-    onUploadStart={onUploadStart}
-    /> 
-  </IKContext>
+  return (
+    <IKContext
+      urlEndpoint={urlEndpoint}
+      publicKey={publicKey}
+      authenticator={authenticator}
+    >
+      <IKUpload
+        fileName="example.png"
+        onError={onError}
+        onSuccess={onSuccess}
+        useUniqueFileName={true}
+        onUploadProgress={onUploadProgress}
+        onUploadStart={onUploadStart}
+      /> 
+    </IKContext>
+  );
 };
 
 export default Upload;
