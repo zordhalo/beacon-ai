@@ -1,8 +1,9 @@
 .rootLayout{
-    padding: 16px 64px;
+    padding: 10px 10px;
     height: 100vh;
     display: flex;
     flex-direction: column;
+    
 
     header{
         display: flex;
@@ -13,13 +14,13 @@
             display: flex;
             align-items: center;
             font-weight: bold;
-            gap: 8px;
+            gap: 10px;
 
             img{
                 width: 32px;
                 height: 32px;
             }
-        }
+        }        
     }
 
     main{
@@ -27,3 +28,4 @@
         overflow: hidden;
     }
 }
+

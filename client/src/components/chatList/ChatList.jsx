@@ -18,8 +18,12 @@ const ChatList = () => {
         
         <span className='title'>DASHBOARD</span>
         <Link to='/dashboard'>Create a new Chat</Link>
+
+{/*}
         <Link to="/">Explore Beacon.ai</Link>
-        <Link to="/">Contact</Link>
+        <Link to="/">Contact</Link> */}
+
+
         <hr/>
         <span className='title'>RECENT CHATS</span>
         <div className="list">
@@ -40,14 +44,14 @@ const ChatList = () => {
 
         <hr/>
 
-
+            {/*}
         <div className="upgrade">
             <img src="/logo.png" alt=""/>
             <div className="texts">
                 <span>Upgrade to Beacon Pro</span>
                 <span>Unlock more features and get more out of Beacon</span>
             </div>
-        </div>
+        </div>*/}
 
         </div> 
   )

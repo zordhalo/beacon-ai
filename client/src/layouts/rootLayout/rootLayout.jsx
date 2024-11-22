@@ -32,7 +32,9 @@ const RootLayout = () => {
          </Link> 
             <div className="user">
           <SignedIn>
+
           <UserButton />
+          
           </SignedIn>
             </div>
         </header>
