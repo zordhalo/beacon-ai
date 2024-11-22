@@ -75,9 +75,9 @@ const NewPrompt = ({ data }) => {
     },
   });
 
+
   const add = async (text, isInitial) => {
     if (!isInitial) setQuestion(text);
-
     try {
       const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
       const result = await chat.sendMessageStream(payload);
@@ -96,6 +96,7 @@ const NewPrompt = ({ data }) => {
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -105,10 +106,16 @@ const NewPrompt = ({ data }) => {
     add(text,false);
   };
 
+  {/* ONLY FOR PRODUCTION */}
+  {/* CHECKS FOR ALREADY EXISTING CHAT HISTORY */}
+  const hasRun = useRef(false);
   useEffect(() => {
+    if(!hasRun.current){
     if(data?.history?.length === 1) {
       add(data.history[0].parts[0].text, true);
     }
+    }
+    hasRun.current = true;
   }, []);
 
   return (
