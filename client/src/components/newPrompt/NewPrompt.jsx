@@ -18,7 +18,8 @@ import { useEffect, useRef, useState } from 'react'
         {
         isLoading: false,
         error:"",
-        dbData:{}
+        dbData:{},
+        aiData:{},
         }
       )
 
@@ -31,13 +32,28 @@ import { useEffect, useRef, useState } from 'react'
     {/* GENERATE CONTENT FROM MODEL*/}  
     const add = async (text) => {
       try {
+
+        {/* SETS QUESTION*/}
         setQuestion(text);
 
-        const result = await model.generateContent(text);
-        const response = await result.response;
+        {/* CHECKS FOR IMAGE DATA*/}
+        const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
+        const result = await model.generateContent(payload);
 
-        setAnswer(response.text());
-      } catch (error) {
+        {/* SETS ANSWER*/} 
+        const response = await result.response;
+        setAnswer(await response.text());
+
+        {/* RESETS IMAGE DATA*/}
+        setImg((prev) => ({
+          isLoading: false,
+          error:"",
+          dbData:{},
+          aiData:{},
+          }));
+      }      
+      catch (error)      
+      {
         console.error("Error generating content:", error); 
       }
     };
