@@ -3,6 +3,8 @@ import NewPrompt from '../../components/newPrompt/NewPrompt'
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import Markdown from 'react-markdown';
+import { IKImage } from 'imagekitio-react';
+import React from 'react';
 
 const ChatPage = () => {
 
@@ -32,7 +34,7 @@ console.log(data);
             ? "Something went wrong!"
 
             : data?.history?.map((message, i) => (
-              <>
+              <React.Fragment key={i}>
                 {message.img && (
                   <div className="message image">
                     <img src={message.img} alt="img" />
@@ -48,11 +50,10 @@ console.log(data);
                   </div>
                 )}
 
-                <div className={message.role === "user" ? "message user" : "message"} 
-                key={i} >
+                <div className={message.role === "user" ? "message user" : "message"}>
                   <Markdown>{message.parts[0].text}</Markdown>
                 </div>
-              </>
+              </React.Fragment>
             ))
           }
           <NewPrompt />

@@ -1,10 +1,11 @@
 import "./dashboardPage.css";
 import { useMutation} from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom";
-import { queryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query"
 
 const DashboardPage = () => {
 
+const queryClient = useQueryClient();
 const navigate = useNavigate();
 
   {/* QUERY CLIENT FOR CHAT HOOKS AND ROUTING*/}
