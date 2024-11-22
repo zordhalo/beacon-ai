@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom'
 import './chatList.css'
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query';
 
 
 const ChatList = () => {
-
 
     const { isPending, error, data } = useQuery({
         queryKey: ["userChats"],
