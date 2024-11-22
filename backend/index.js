@@ -66,9 +66,9 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
     const savedChat = await newChat.save();
 
     // CHECK if user chats exist
-    const userChats = await UserChats.find({ userId: userId });
+    const userChats = await UserChats.findOne({ userId: userId });
 
-    if (!userChats.length) {
+    if (!userChats) {
       // CREATE A NEW USER CHAT
       const newUserChats = new UserChats({
         userId: userId,
@@ -83,21 +83,14 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
       await newUserChats.save();
     } else {
       // ADD NEW CHAT TO EXISTING CHATS
-      await UserChats.findOneAndUpdate(
-        { userId: userId },
-        {
-          $push: {
-            chats: {
-              _id: savedChat._id,
-              title: text.substring(0, 40),
-            },
-          },
-        },
-        { new: true }
-      );
+      userChats.chats.push({
+        _id: savedChat._id,
+        title: text.substring(0, 40),
+      });
+      await userChats.save();
     }
 
-    res.status(200).send(newChat._id);
+    res.status(200).send({ id: newChat._id });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error saving chat");
@@ -131,6 +124,37 @@ app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error fetching chat");
+  }
+});
+
+{/* ADD CONVERSATION TO CHAT HISTORY*/}
+app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+
+  const { question, answer, img } = req.body;
+
+  const newItems = [
+    ...(question
+      ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }]
+      : []),
+    { role: "model", parts: [{ text: answer }] },
+  ];
+
+  try {
+    const updatedChat = await Chat.updateOne(
+      { _id: req.params.id, userId },
+      {
+        $push: {
+          history: {
+            $each: newItems,
+          },
+        },
+      }
+    );
+    res.status(200).send(updatedChat);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error adding conversation!");
   }
 });
 

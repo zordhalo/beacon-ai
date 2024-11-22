@@ -26,7 +26,7 @@ console.log(data);
     <div className="chatPage">
       <div className="wrapper">
         <div className="chat">
-          <div className="message">Test message from ai</div>
+          <div className="message"></div>
 
           {isPending 
             ? "Loading..."
@@ -56,7 +56,7 @@ console.log(data);
               </React.Fragment>
             ))
           }
-          <NewPrompt />
+          <NewPrompt data={data}/>
         </div>
       </div>
     </div>

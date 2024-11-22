@@ -6,8 +6,12 @@ import Markdown from 'react-markdown';
   {/* IMPORT IMAGE KIT*/}
 import { IKContext, IKImage } from 'imagekitio-react';
 import { useEffect, useRef, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { set } from 'mongoose';
 
-    const NewPrompt = () => {
+
+
+const NewPrompt = ({data}) => {
 
       {/* STATE FOR QUESTION AND ANSWER*/}
       const [question, setQuestion] = useState("");
@@ -20,8 +24,7 @@ import { useEffect, useRef, useState } from 'react'
         error:"",
         dbData:{},
         aiData:{},
-        }
-      )
+        })
 
       const chat = model.startChat({
         history: [
@@ -44,13 +47,49 @@ import { useEffect, useRef, useState } from 'react'
       endRef.current.scrollIntoView({ behavior: "smooth" })
     }, [question, answer, img.dbData]);  {/* SCROLL WHEN QUESTION, ANSWER OR IMAGE IS ADDED*/}
 
+    
+const queryClient = useQueryClient();
+
+  {/* QUERY CLIENT FOR CHAT HOOKS AND ROUTING*/}
+  const mutation = useMutation({
+    mutationFn: () => {
+      return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          question: question.length ? question : undefined,
+          answer,
+          img: img.dbData?.filePath || undefined ,
+        }),
+      }).then((res) => res.json());
+    },
+    onSuccess: () => {
+      //invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
+        setQuestion("");
+        setAnswer("");
+        setImg({
+          isLoading: false,
+          error:"",
+          dbData:{},
+          aiData:{},
+        });
+        });
+      },
+      onError: (error) => {
+        console.log("Error adding conversation:", error);
+      },
+    });
+
     {/* GENERATE CONTENT FROM MODEL*/}  
     const add = async (text) => {
-      try {
-
         {/* SETS QUESTION*/}
         setQuestion(text);
 
+    try{
         {/* CHECKS FOR IMAGE DATA*/}
         const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
         const result = await chat.sendMessageStream(payload);
@@ -64,20 +103,13 @@ import { useEffect, useRef, useState } from 'react'
         accumulatedText += chunkText;
         setAnswer(accumulatedText);
         }
-        setImg((prev) => ({ 
-          isLoading: false,
-          error:"",
-          dbData:{},
-          aiData:{},
-        }));
-      }      
-      catch (error)      
-      {
+        
+        mutation.mutate(text);
+      } catch (error) {
         console.error("Error generating content:", error); 
       }
-    };
 
-    {/* HANDLE FORM SUBMISSION*/}
+  {/* HANDLE FORM SUBMISSION*/}
   const handleSubmit = async (e) => {
   e.preventDefault()
 

@@ -20,7 +20,8 @@ const navigate = useNavigate();
         body: JSON.stringify({ text }),
       }).then((res) => res.json());
     },
-    onSuccess: (id) => {
+    onSuccess: (data) => {
+      const { id } = data;
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["userChats"] });
       navigate(`/dashboard/chats/${id}`);
