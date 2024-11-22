@@ -1,4 +1,5 @@
 import { IKContext, IKUpload } from "imagekitio-react";
+import { useRef } from "react";
 
 
 const urlEndpoint = import.meta.env.VITE_IMAGE_KIT_ENDPOINT;
@@ -22,6 +23,8 @@ const authenticator = async (setImg) => {
 };
 
 const Upload = ({setImg}) => {
+
+  const ikUploadRef = useRef(null);
 
     const onError = (err) => {
       console.log("Error", err);
@@ -48,13 +51,20 @@ const Upload = ({setImg}) => {
       authenticator={authenticator}
     >
       <IKUpload
-        fileName="example.png"
+        fileName="test-upload.png"
         onError={onError}
         onSuccess={onSuccess}
         useUniqueFileName={true}
         onUploadProgress={onUploadProgress}
         onUploadStart={onUploadStart}
+        style={{ display: "none" }}
+        ref={ikUploadRef}
       /> 
+  {
+    <label onClick={() => ikUploadRef.current.click()}>
+      <img src="/attachment.png" alt="" />
+    </label>
+  }
     </IKContext>
   );
 };

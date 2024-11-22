@@ -28,7 +28,7 @@
         &::-webkit-scrollbar-track {
             background: transparent;
         }
-
+ 
         &:not(:hover)::-webkit-scrollbar-thumb {
             background: transparent;
         }
@@ -39,7 +39,7 @@
             flex-direction: column;
             gap: 20px;
 
-            p,ai{
+            p,li{
                 margin: 10px 0px;
             }
         
