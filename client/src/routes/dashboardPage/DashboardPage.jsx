@@ -1,17 +1,28 @@
 import "./dashboardPage.css";
+import { useAuth } from "@clerk/clerk-react"
 import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
 
-  const navigate = useNavigate();
+const {userId} = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const text = e.target.text.value;
     if (!text) return;
 
-    mutation.mutate(text);
+    {/*ADD NEW CHAT TO THE DATABASE*/}
+      await fetch("http://localhost:3000/api/chats", 
+        {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      })
   };
+
   return (
     <div className="dashboardPage">
       <div className="texts">
