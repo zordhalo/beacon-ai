@@ -26,11 +26,16 @@ const INITIAL_IMG_STATE = {
 };
 
 const NewPrompt = ({ data }) => {
+
+  const queryClient = useQueryClient();
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [img, setImg] = useState(INITIAL_IMG_STATE);
+
+  {/* Refs for scrolling to the end of the chat and the form */}
   const endRef = useRef(null);
-  const queryClient = useQueryClient();
+  const formRef = useRef(null);
 
   const chat = model.startChat({
     history: INITIAL_CHAT_HISTORY,
@@ -39,7 +44,7 @@ const NewPrompt = ({ data }) => {
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [question, answer, img.dbData]);
+  }, [data, question, answer, img.dbData]);
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -57,7 +62,9 @@ const NewPrompt = ({ data }) => {
       }).then((res) => res.json());
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
+      queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).
+      then(() => {
+        formRef.current.reset();
         setQuestion("");
         setAnswer("");
         setImg(INITIAL_IMG_STATE);
@@ -78,12 +85,13 @@ const NewPrompt = ({ data }) => {
       let accumulatedText = "";
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
-        console.log(chunkText);
         accumulatedText += chunkText;
         setAnswer(accumulatedText);
       }
+      
+      // Only mutate after streaming is complete
+      mutation.mutate();
 
-      mutation.mutate(text);
     } catch (error) {
       console.error("Error generating content:", error);
     }
