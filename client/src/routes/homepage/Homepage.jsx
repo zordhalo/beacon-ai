@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 
 const Homepage = () => {
-    const[typingStatus, setTypingStatus] = useState("human1");
 
     return (
         <div className='homepage'>
