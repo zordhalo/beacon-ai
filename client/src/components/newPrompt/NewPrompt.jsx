@@ -23,6 +23,21 @@ import { useEffect, useRef, useState } from 'react'
         }
       )
 
+      const chat = model.startChat({
+        history: [
+          {
+            role: "user",
+            parts: [{ text: "Hello" }],
+          },
+          {
+            role: "model",
+            parts: [{ text: "Great to meet you. What would you like to know?" }],
+          },
+        ],
+        generationConfig: {
+          //maxOutputTokens: 100,
+     } });
+
     {/* SCROLL TO BOTTOM OF CHAT*/}
     const endRef = useRef(null)
     useEffect(() => {
@@ -38,19 +53,23 @@ import { useEffect, useRef, useState } from 'react'
 
         {/* CHECKS FOR IMAGE DATA*/}
         const payload = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
-        const result = await model.generateContent(payload);
+        const result = await chat.sendMessageStream(payload);
 
         {/* SETS ANSWER*/} 
-        const response = await result.response;
-        setAnswer(await response.text());
-
-        {/* RESETS IMAGE DATA*/}
-        setImg((prev) => ({
+        let accumulatedText = "";
+        for await (const chunk of result.stream) 
+        {
+        const chunkText = chunk.text();
+        console.log(chunkText);
+        accumulatedText += chunkText;
+        setAnswer(accumulatedText);
+        }
+        setImg((prev) => ({ 
           isLoading: false,
           error:"",
           dbData:{},
           aiData:{},
-          }));
+        }));
       }      
       catch (error)      
       {
@@ -59,7 +78,7 @@ import { useEffect, useRef, useState } from 'react'
     };
 
     {/* HANDLE FORM SUBMISSION*/}
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
   e.preventDefault()
 
   const text = e.target.text.value;
