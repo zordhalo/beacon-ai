@@ -1,3 +1,4 @@
+import React from 'react';
 import { Outlet, useNavigate} from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import { useEffect } from 'react'
@@ -20,7 +21,9 @@ useEffect(() => {
 if(!isLoaded) return "Loading...";
   return (
     <div className='dashboardLayout'>
-        <div className="menu"><ChatList/></div>
+        <div className="menu">
+          <ChatList /> {/* Consider memoizing ChatList if it causes re-renders */}
+        </div>
         <div className="content">
             <Outlet />
         </div>

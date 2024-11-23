@@ -38,11 +38,15 @@ const ChatList = () => {
           ? "Loading..."
           : error
           ? "Something went wrong"
+
+
           : data?.map((chat) => (
               <div key={chat._id} className="chatItem">
                 <Link to={`/dashboard/chats/${chat._id}`}>
                   {chat.title}
                 </Link>
+
+                
                 <button onClick={() => handleDelete(chat._id)}>Delete</button>
               </div>
             ))}

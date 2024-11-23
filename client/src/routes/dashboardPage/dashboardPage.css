@@ -35,10 +35,14 @@
     }
     .formContainer{
         margin-top: auto;
-        width: 50%;
+        width: 250%; /* Increased from default */
+        max-width: 800px; /* Added max-width */
         background-color: #2c2937;
         border-radius: 15px;
         display: flex; 
+        margin: 0 auto;
+        padding: 1px; /* Increased padding */
+        margin-left: -130px;
 
          form{
             width: 100%;
@@ -46,23 +50,24 @@
             display: flex;
             align-items: center;
             justify-content: spaceg-between;
-            gap: 20px;
+            gap: 15px; /* Increased gap */
             margin-bottom: 2px;
         }
             input{
                 flex : 1;
-                padding: 20px;
+                padding: 15px 10px; /* Increased padding */
                 background-color: transparent;
                 border: none;
                 outline: none;
                 color: #ececec;
+                font-size: 16px; /* Increased font size */
             }
             button{
                 background-color: #605e68;
-                border-radius: 50%;
+                border-radius: 30%;
                 border : none;
                 cursor: pointer;
-                padding: 10px;
+                padding: 5px 5px; /* Increased padding */
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -74,5 +79,30 @@
             }
          }
     }
+}
+
+.formContainer button.pulsing img {
+  animation: pulse 2s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+}
+
+.formContainer button:disabled {
+  cursor: wait;
+  background-color: #2c2937;
 }
 

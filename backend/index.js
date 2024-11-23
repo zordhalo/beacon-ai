@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import ImageKit from "imagekit";
@@ -5,7 +7,7 @@ import mongoose from "mongoose";
 import Chat from "./models/chat.js";
 import UserChats from "./models/userChats.js";
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
-import { OpenAI } from "openai";  // Add this import
+import { OpenAI } from "openai";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -14,6 +16,7 @@ const app = express();
 app.use(
   cors({
     origin: process.env.CLIENT_URL, 
+    credentials: true, // allows session cookies to be sent back and forth
     credentials: true, // allows session cookies to be sent back and forth
   })
 );
@@ -24,11 +27,16 @@ app.use(express.json());
 // DATABASE CONNECTION
 const connect = async () => {
   try {
-    await mongoose.connect(process.env.MONGO);  // MONGO CONNECTION
+    await mongoose.connect(process.env.MONGO, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      maxPoolSize: 10, // Updated from poolSize to maxPoolSize
+    });
     console.log("Connected to MongoDB");
   } catch (err) {
     console.log(err);
-  }};
+  }
+};
 
 // ROUTES FOR IMAGE UPLOAD
 const imagekit = new ImageKit({
@@ -42,21 +50,15 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-/*
-// Clerk Test Route
-app.get("/api/test", ClerkExpressRequireAuth(), (req, res) => 
-  {
-    const userId = req.auth.userId;
-  res.send("Hello World");
-  console.log(userId);
-});*/
-
-// ROUTES FOR CHATS INCLUDING AUTHENTICATION
+// OpenAI client instance
 const openai = new OpenAI({
   apiKey: process.env.SAMBANOVA_API_KEY,
-  baseURL: process.env.SAMBANOVA_API_URL
+  baseURL: process.env.SAMBANOVA_API_URL,
+  timeout: 20000, // Set default timeout
+  maxRetries: 2, // Set max retries
 });
 
+// ROUTES FOR CHATS INCLUDING AUTHENTICATION
 app.post("/api/chat", ClerkExpressRequireAuth(), async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -69,16 +71,28 @@ app.post("/api/chat", ClerkExpressRequireAuth(), async (req, res) => {
       prompt: prompt,
       max_tokens: 300,
       temperature: 0.7,
-      // Add timeout handling
       timeout: 30000
     });
+
+    console.log("OpenAI Completion Response:", JSON.stringify(completion, null, 2)); // Enhanced logging
+
+    if (
+      !completion ||
+      !completion.choices ||
+      !Array.isArray(completion.choices) ||
+      completion.choices.length === 0 ||
+      !completion.choices[0].text
+    ) {
+      console.error("Invalid completion format:", completion);
+      return res.status(500).json({ error: "Invalid AI response format." });
+    }
 
     res.json({ answer: completion.choices[0].text });
   } catch (error) {
     console.error('OpenAI API Error:', error);
-    res.status(500).json({ 
-      error: error.message,
-      details: error.response?.data || 'Unknown error'
+    res.status(503).json({ 
+      error: 'Service Unavailable',
+      message: 'Meta-Llama-3.1-70B-Instruct is temporarily unavailable. Please try again later!'
     });
   }
 });
@@ -88,16 +102,16 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
     const { title, history } = req.body;
     const userId = req.auth.userId;
 
-    // Validate required fields
-    if (!title || !history || !history.length) {
-      return res.status(400).json({ error: "Missing required chat data" });
-    }
+    // Validate and format each history entry
+    const formattedHistory = history.map(entry => ({
+      role: entry.role,
+      parts: entry.parts
+    }));
 
-    // Create new chat
     const chat = new Chat({
       userId,
       title,
-      history
+      history: formattedHistory, // Use the formatted history
     });
 
     const savedChat = await chat.save();
@@ -110,9 +124,9 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
           chats: { 
             _id: savedChat._id, 
             title: savedChat.title,
-            createdAt: new Date() 
-          } 
-        } 
+            createdAt: new Date()
+          }
+        }
       },
       { upsert: true }
     );
@@ -120,7 +134,7 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
     res.status(201).json(savedChat);
   } catch (error) {
     console.error("Error creating chat:", error);
-    res.status(500).json({ error: "Failed to create chat" });
+    res.status(500).json({ error: "Failed to create chat", details: error.message });
   }
 });
 
@@ -163,35 +177,58 @@ app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
 });
 
 {/* ADD CONVERSATION TO CHAT HISTORY*/}
+const MAX_USER_MESSAGE_LENGTH = 500;
+const MAX_AI_RESPONSE_LENGTH = 1000;
+
 app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
+  const { question, answer } = req.body;
 
-  const { question, answer, img } = req.body;
+  // Validate message lengths
+  if (question && question.length > MAX_USER_MESSAGE_LENGTH) {
+    return res.status(400).json({ error: "User message exceeds maximum length" });
+  }
 
-  const newItems = [
-    ...(question
-      ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }]
-      : []),
-    { role: "model", parts: [{ text: answer }] },
-  ];
+  if (answer && answer.length > MAX_AI_RESPONSE_LENGTH) {
+    const truncatedAnswer = answer.substring(0, MAX_AI_RESPONSE_LENGTH) + "...";
+    req.body.answer = truncatedAnswer;
+  }
 
   try {
-    const updatedChat = await Chat.updateOne(
+    // Add messages one at a time to maintain order
+    const chatWithUserMsg = await Chat.findOneAndUpdate(
       { _id: req.params.id, userId },
       {
         $push: {
-          history: {
-            $each: newItems,
-          },
-        },
-      }
+          history: { role: 'user', parts: [{ text: question }] }
+        }
+      },
+      { new: true }
     );
+
+    const updatedChat = await Chat.findOneAndUpdate(
+      { _id: req.params.id, userId },
+      {
+        $push: {
+          history: { role: 'model', parts: [{ text: answer }] }
+        }
+      },
+      { new: true }
+    );
+
     res.status(200).send(updatedChat);
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error adding conversation!");
+    console.error(err);
+    res.status(500).send("Error updating chat!");
   }
 });
+
+// DELETE A CHAT
+app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
+    console.error(err);
+    res.status(500).send("Error updating chat!");
+  }
+,);
 
 // DELETE A CHAT
 app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
@@ -215,10 +252,11 @@ app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-{/* CLERK ERROR HANDLING*/}
+// CLERK ERROR HANDLING
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(401).send("Unauthorized");
+
 });
 
 // ROUTES FOR CHAT HISTORY

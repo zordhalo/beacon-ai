@@ -11,10 +11,13 @@ const DashboardPage = () => {
   const mutation = useMutation({
     mutationFn: async (text) => {
       try {
-        // Get AI response
-        const aiResponse = await makeAPICall(text);
-        
-        // Create chat with both question and answer
+        const aiResponse = await makeAPICall(text); // Updated makeAPICall
+        console.log("AI Response:", aiResponse); // Added logging
+
+        if (!aiResponse) {
+          throw new Error("AI response is empty.");
+        }
+
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
           method: "POST",
           headers: {
@@ -23,15 +26,23 @@ const DashboardPage = () => {
           credentials: "include",
           body: JSON.stringify({
             title: text.substring(0, 50),
-            history: [{
-              question: text,
-              answer: aiResponse
-            }]
+            history: [
+              {
+                role: "user",
+                parts: [{ text }]
+              },
+              {
+                role: "model",
+                parts: [{ text: aiResponse }]
+              }
+            ]
           })
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create chat');
+          const errorData = await response.json();
+          console.error("Create Chat Error Response:", errorData); // Added logging
+          throw new Error(errorData.error || 'Failed to create chat');
         }
 
         return response.json();
@@ -42,8 +53,14 @@ const DashboardPage = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["userChats"] });
+      queryClient.invalidateQueries({ queryKey: ["chat", data._id] }); // Ensure chat data is refetched
       navigate(`/dashboard/chats/${data._id}`);
-    }
+    },
+    onError: (error) => {
+      console.error("Mutation Error:", error);
+    },
+    retry: 2, // Added retry mechanism
+    retryDelay: 1000, // 1 second delay between retries
   });
 
   const handleSubmit = (e) => {
@@ -71,8 +88,8 @@ const DashboardPage = () => {
             placeholder="Ask me anything..."
             disabled={mutation.isPending} 
           />
-          <button disabled={mutation.isPending}>
-            {mutation.isPending ? 'Generating...' : <img src="/arrow.png" alt="" />}
+          <button disabled={mutation.isPending} className={mutation.isPending ? 'pulsing' : ''}>
+            <img src="/arrow.png" alt="" />
           </button>
         </form>
         {mutation.error && <div className="error">{mutation.error.message}</div>}
