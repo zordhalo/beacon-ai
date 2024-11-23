@@ -2,6 +2,10 @@ const CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
 
 const makeAPICall = async (message) => {
   try {
+    // Define your prompt directly or fetch it from a frontend-safe source
+    const fullPrompt = `Your predefined therapist prompt here.\nUser: ${message}\nAssistant:`;
+    console.log("Full Prompt:", fullPrompt); // Added logging
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // Reduced timeout to 20 seconds
 
@@ -10,7 +14,7 @@ const makeAPICall = async (message) => {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({
-        message: message,
+        prompt: fullPrompt,
         model: "Meta-Llama-3.1-70B-Instruct"
       }),
       signal: controller.signal

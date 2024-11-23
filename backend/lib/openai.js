@@ -1,3 +1,4 @@
+
 import dotenv from 'dotenv';
 dotenv.config();
 import express from "express";
@@ -61,16 +62,14 @@ const openai = new OpenAI({
 // ROUTES FOR CHATS INCLUDING AUTHENTICATION
 app.post("/api/chat", ClerkExpressRequireAuth(), async (req, res) => {
   try {
-    const { message } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: 'Message is required' });
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
     }
-
-    const fullPrompt = `${therapistPrompt}\n${USER_HEADER}${message}\n${ASSISTANT_HEADER}`;
 
     const completion = await openai.completions.create({
       model: "Meta-Llama-3.1-70B-Instruct",
-      prompt: fullPrompt,
+      prompt: prompt,
       max_tokens: 300,
       temperature: 0.7,
       timeout: 30000
