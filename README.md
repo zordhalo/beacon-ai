@@ -1,10 +1,10 @@
-# 🌟 AI Therapist Overview
+# Beacon.ai Application Overview:
 
 ## Core Components
 The code shows a thoughtful implementation of an AI therapist named "Dr. Emma Thompson" with:
-- 🤝 Person-centered therapeutic approach
-- 💭 Cognitive-behavioral therapy expertise
-- 🗣️ Natural conversation capabilities
+   - Advanced reasoning and knowlege reasources for support.
+   - Modern front end design made for maximum usability.
+   - Well designed back end with high security features and user data storage.
 
 ## Exciting Applications
 1. **Multi-modal Integration Potential**:
@@ -33,4 +33,4 @@ The code shows a thoughtful implementation of an AI therapist named "Dr. Emma Th
 - Supportive and validating responses
 - Focus on user wellbeing
 
-Remember: This AI therapist is designed as a supportive tool, not a replacement for human mental health professionals! 🌈
+Remember: This AI therapist is designed as a supportive tool, not a replacement for human mental health professionals! 
