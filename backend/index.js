@@ -15,9 +15,10 @@ const app = express();
 // MIDDLEWARES
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, 
+    origin: process.env.CLIENT_URL,
     credentials: true, // allows session cookies to be sent back and forth
-    credentials: true, // allows session cookies to be sent back and forth
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
@@ -66,28 +67,55 @@ app.post("/api/chat", ClerkExpressRequireAuth(), async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    const completion = await openai.completions.create({
-      model: "Meta-Llama-3.1-70B-Instruct",
-      prompt: prompt,
-      max_tokens: 300,
-      temperature: 0.7,
-      timeout: 30000
-    });
+    // Support for both GPT-5 and Meta-Llama models
+    const model = req.body.model || "Meta-Llama-3.1-70B-Instruct"; 
+    const isGPT5 = model.toLowerCase().includes('gpt-5');
+    
+    let completion;
+    if (isGPT5) {
+      // GPT-5 uses the chat completion API
+      completion = await openai.chat.completions.create({
+        model: "gpt-5-preview",
+        messages: [
+          { role: "system", content: "You are a helpful AI assistant." },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+        timeout: 30000
+      });
+    } else {
+      // Fallback to Meta-Llama for regular completions
+      completion = await openai.completions.create({
+        model: "Meta-Llama-3.1-70B-Instruct",
+        prompt: prompt,
+        max_tokens: 300,
+        temperature: 0.7,
+        timeout: 30000
+      });
+    }
 
     console.log("OpenAI Completion Response:", JSON.stringify(completion, null, 2)); // Enhanced logging
 
-    if (
-      !completion ||
-      !completion.choices ||
-      !Array.isArray(completion.choices) ||
-      completion.choices.length === 0 ||
-      !completion.choices[0].text
-    ) {
+    if (!completion || !completion.choices || completion.choices.length === 0) {
       console.error("Invalid completion format:", completion);
       return res.status(500).json({ error: "Invalid AI response format." });
     }
+    
+    // Handle different response formats between completion and chat completion APIs
+    let responseText;
+    if (isGPT5) {
+      responseText = completion.choices[0].message?.content;
+    } else {
+      responseText = completion.choices[0].text;
+    }
+    
+    if (!responseText) {
+      console.error("Missing response text in completion:", completion);
+      return res.status(500).json({ error: "Invalid AI response format." });
+    }
 
-    res.json({ answer: completion.choices[0].text });
+    res.json({ answer: responseText, model: isGPT5 ? "gpt-5-preview" : "Meta-Llama-3.1-70B-Instruct" });
   } catch (error) {
     console.error('OpenAI API Error:', error);
     res.status(503).json({ 
@@ -182,7 +210,7 @@ const MAX_AI_RESPONSE_LENGTH = 1000;
 
 app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
-  const { question, answer } = req.body;
+  const { question, answer, img } = req.body;
 
   // Validate message lengths
   if (question && question.length > MAX_USER_MESSAGE_LENGTH) {
@@ -196,11 +224,16 @@ app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
 
   try {
     // Add messages one at a time to maintain order
+    // Build user message parts with optional image
+    const userParts = img 
+      ? [{ text: question, img: img }]
+      : [{ text: question }];
+    
     const chatWithUserMsg = await Chat.findOneAndUpdate(
       { _id: req.params.id, userId },
       {
         $push: {
-          history: { role: 'user', parts: [{ text: question }] }
+          history: { role: 'user', parts: userParts }
         }
       },
       { new: true }
@@ -222,13 +255,6 @@ app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
     res.status(500).send("Error updating chat!");
   }
 });
-
-// DELETE A CHAT
-app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
-    console.error(err);
-    res.status(500).send("Error updating chat!");
-  }
-,);
 
 // DELETE A CHAT
 app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {

@@ -49,7 +49,7 @@
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: spaceg-between;
+            justify-content: space-between;
             gap: 15px; /* Increased gap */
             margin-bottom: 2px;
         }

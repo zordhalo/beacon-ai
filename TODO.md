@@ -1,17 +1,20 @@
-# Beacon AI — TODO
+# Beacon - [x] Support image attachments in chat history end-to-end:
+  - Extend message schema to store optional `img` on history items in [backend/models/chat.js](backend/models/chat.js).
+  - Update PUT handler in [backend/index.js](backend/index.js) to optionally include `img` on the user's message when present.
+  - Ensure renderer uses `item.img` (already handled in [client/src/routes/chatPage/ChatPage.jsx](client/src/routes/chatPage/ChatPage.jsx)). TODO
 
 This is the up-to-date task list for Beacon AI. Tasks are grouped by area and reference files/symbols to help navigation.
 
 ## Critical fixes (P0)
 
-- [ ] Remove duplicate and broken DELETE route in [backend/index.js](backend/index.js). There are two `app.delete("/api/chats/:id", ...)` blocks; the first one logs `err` (undefined) and should be deleted.
-- [ ] Align ImageKit upload authenticator to use environment config in [`Upload`](client/src/components/upload/Upload.jsx) instead of hard-coded `http://localhost:3000`:
+- [x] Remove duplicate and broken DELETE route in [backend/index.js](backend/index.js). There are two `app.delete("/api/chats/:id", ...)` blocks; the first one logs `err` (undefined) and should be deleted.
+- [x] Align ImageKit upload authenticator to use environment config in [`Upload`](client/src/components/upload/Upload.jsx) instead of hard-coded `http://localhost:3000`:
   - Replace with `${import.meta.env.VITE_API_URL}/api/upload` in [client/src/components/upload/Upload.jsx](client/src/components/upload/Upload.jsx).
 - [ ] Support image attachments in chat history end-to-end:
   - Extend message schema to store optional `img` on history items in [backend/models/chat.js](backend/models/chat.js).
   - Update PUT handler in [backend/index.js](backend/index.js) to optionally include `img` on the user’s message when present.
   - Ensure renderer uses `item.img` (already handled in [client/src/routes/chatPage/ChatPage.jsx](client/src/routes/chatPage/ChatPage.jsx)).
-- [ ] Fix typo in dashboard form CSS: `justify-content: spaceg-between` → `space-between` in [client/src/routes/dashboardPage/dashboardPage.css](client/src/routes/dashboardPage/dashboardPage.css).
+- [x] Fix typo in dashboard form CSS: `justify-content: spaceg-between` → `space-between` in [client/src/routes/dashboardPage/dashboardPage.css](client/src/routes/dashboardPage/dashboardPage.css).
 
 ## Frontend (P1)
 
@@ -28,7 +31,7 @@ This is the up-to-date task list for Beacon AI. Tasks are grouped by area and re
 
 ## Backend (P1)
 
-- [ ] CORS cleanup: remove duplicate `credentials` key and explicitly set allowed methods/headers in [backend/index.js](backend/index.js).
+- [x] CORS cleanup: remove duplicate `credentials` key and explicitly set allowed methods/headers in [backend/index.js](backend/index.js).
 - [ ] Add request size limits and security middleware:
   - `express.json({ limit: '1mb' })`
   - Helmet, basic rate-limiting (IP-based) in [backend/index.js](backend/index.js).

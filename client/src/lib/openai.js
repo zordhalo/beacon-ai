@@ -9,13 +9,17 @@ const makeAPICall = async (message) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // Reduced timeout to 20 seconds
 
+    // Check if user has enabled GPT-5
+    const useGPT5 = localStorage.getItem('useGPT5') === 'true';
+    const model = useGPT5 ? "gpt-5-preview" : "Meta-Llama-3.1-70B-Instruct";
+    
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({
         prompt: fullPrompt,
-        model: "Meta-Llama-3.1-70B-Instruct"
+        model: model
       }),
       signal: controller.signal
     });
