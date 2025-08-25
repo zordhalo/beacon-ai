@@ -25,7 +25,7 @@ const RootLayout = () => {
     <div className='rootLayout'>
         <header>
         <Link to="/" className="logo">
-         <img src="/logo.png" alt="" />
+         <img src="/MoonAinBLs.png" alt="" />
          <span>Beacon.ai</span>
          </Link> 
             <div className="user">

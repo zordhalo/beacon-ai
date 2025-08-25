@@ -76,7 +76,7 @@ const DashboardPage = () => {
     <div className="dashboardPage">
       <div className="texts">
         <div className="logo">
-          <img src="/logo.png" alt="" />
+          <img src="/MoonAinBLs.png" alt="" />
           <h1>Beacon.ai</h1>
         </div>
       </div>

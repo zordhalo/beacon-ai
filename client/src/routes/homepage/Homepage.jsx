@@ -29,7 +29,7 @@ const Homepage = () => {
 */}
 
            <div className="terms">
-            <img src="/logo.png" alt="" />
+            <img src="/MoonAinBLs.png" alt="" />
             <div className="links">
                 <Link to="/">Terms of Service</Link>
                 <Link to="/">Privacy Policy</Link>
