@@ -1,6 +1,6 @@
 # Beacon AI
 
-![Beacon AI Logo](client/public/logo.png)
+![Beacon AI Logo](client/public/MoonAinBL.png)
 
 Beacon AI is a therapist chatbot application that uses artificial intelligence to help users with their mental health. The application provides an intuitive interface for users to chat with an AI therapist, manage their conversation history, and upload images for analysis.
 
