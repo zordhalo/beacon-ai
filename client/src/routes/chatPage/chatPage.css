@@ -59,12 +59,6 @@
     }
 }
 
-.message.model {
-  /* Ensure AI messages are visible */
-  background-color: #f0f0f0;
-  /* ...other styles... */
-}
-
 .message.typing {
     background-color: #2c2937;
     display: flex;
