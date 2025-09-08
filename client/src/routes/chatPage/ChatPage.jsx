@@ -90,15 +90,19 @@ const ChatPage = () => {
     retryDelay: 1000, // 1 second delay between retries
   });
 
-  const add = async (text, isInitial) => {
+  const add = async (text, isInitial, imageData = null) => {
     if (!isInitial) {
       setQuestion(text);
-      // Immediately add user message to UI
+      // Immediately add user message to UI with optional image
+      const userParts = imageData 
+        ? [{ text, img: imageData }]
+        : [{ text }];
+        
       queryClient.setQueryData(["chat", id], (oldData) => ({
         ...oldData,
         history: [
           ...oldData.history,
-          { _id: generateId(), role: "user", parts: [{ text }] },
+          { _id: generateId(), role: "user", parts: userParts },
         ],
       }));
     }
@@ -111,7 +115,7 @@ const ChatPage = () => {
       } else {
         setAnswer(aiResponse);
         
-        // Then mutate with both messages
+        // Then mutate with both messages, including image data
         mutation.mutate({
           question: text,
           answer: aiResponse
@@ -140,7 +144,10 @@ const ChatPage = () => {
     const text = e.target.text.value;
     if (!text) return;
 
-    add(text, false);
+    // Get image data if available
+    const imageData = img.dbData?.filePath || null;
+    
+    add(text, false, imageData);
     e.target.reset();
   };
 
@@ -172,22 +179,24 @@ const ChatPage = () => {
         <div className="chat">
           {data.history.map((item) => (
             <React.Fragment key={item._id}>
-              {item.img && (
-                <IKImage
-                  urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
-                  path={item.img}
-                  height="300"
-                  width="400"
-                  transformation={[{ height: 300, width: 400 }]}
-                  loading="lazy"
-                  lqip={{ active: true, quality: 20 }}
-                />
-              )}
               <div className={`message ${item.role}`}>
                 {/* Render all parts of the message */}
                 {item.parts && item.parts.length > 0 ? (
                   item.parts.map((part, idx) => (
-                    <Markdown key={idx}>{part.text}</Markdown>
+                    <React.Fragment key={idx}>
+                      {part.img && (
+                        <IKImage
+                          urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+                          path={part.img}
+                          height="300"
+                          width="400"
+                          transformation={[{ height: 300, width: 400 }]}
+                          loading="lazy"
+                          lqip={{ active: true, quality: 20 }}
+                        />
+                      )}
+                      <Markdown>{part.text}</Markdown>
+                    </React.Fragment>
                   ))
                 ) : (
                   <Markdown>{/* Fallback content */}</Markdown>
