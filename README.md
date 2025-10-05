@@ -116,6 +116,9 @@ This application implements several security best practices:
 - Authentication with Clerk
 - CORS configuration to restrict origins
 - Proper error handling and input validation
+- **Helmet** for security headers (XSS, clickjacking, MIME sniffing protection)
+- **Rate limiting** (100 requests per 15 minutes per IP) to prevent abuse
+- **Request size limits** (1MB) to prevent memory exhaustion attacks
 
 For more details on security practices and requirements, see the [SECURITY.md](./SECURITY.md) file.
 
