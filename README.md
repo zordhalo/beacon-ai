@@ -30,6 +30,10 @@ Beacon AI is a therapist chatbot application that uses artificial intelligence t
 - **Clerk SDK** for authentication management
 - **CORS** for secure cross-origin requests
 
+## ⚡ Quick Start
+
+**New to Beacon AI?** Check out our [Quick Start Guide](QUICKSTART.md) to get up and running in under 10 minutes!
+
 ## 📋 Prerequisites
 
 - Node.js (v16+)
