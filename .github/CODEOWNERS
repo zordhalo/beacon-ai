@@ -1,0 +1,33 @@
+# Code Owners for Beacon AI
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, they will be requested for
+# review when someone opens a pull request.
+
+# Global owners
+* @zordhalo
+
+# Backend specific
+/backend/ @zordhalo
+/backend/services/ @zordhalo
+/backend/routes/ @zordhalo
+/backend/models/ @zordhalo
+
+# Frontend specific
+/client/ @zordhalo
+/client/src/components/ @zordhalo
+/client/src/routes/ @zordhalo
+
+# Documentation
+*.md @zordhalo
+/docs/ @zordhalo
+
+# Configuration and infrastructure
+/.github/ @zordhalo
+/backend/.env.example @zordhalo
+/client/.env.example @zordhalo
+docker-compose.yml @zordhalo
+Dockerfile @zordhalo
+
+# Security-sensitive files
+/SECURITY.md @zordhalo
+/backend/services/auth.service.js @zordhalo

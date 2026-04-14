@@ -28,6 +28,10 @@ Beacon AI is a therapist chatbot application that uses artificial intelligence t
 - **Clerk SDK** for authentication management
 - **CORS** for secure cross-origin requests
 
+## ⚡ Quick Start
+
+**New to Beacon AI?** Check out our [Quick Start Guide](QUICKSTART.md) to get up and running in under 10 minutes!
+
 ## 📋 Prerequisites
 
 - Node.js (v16+)
@@ -155,12 +159,34 @@ beacon-ai/
 
 ## 📄 License
 
-[License information]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👥 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct, development process, and how to submit pull requests.
+
+### Quick Links for Contributors
+
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- [Missing Features Analysis](MISSING_FEATURES_ANALYSIS.md) - Feature roadmap and gaps
+- [Changelog](CHANGELOG.md) - Version history
+- [Code of Conduct](CONTRIBUTING.md#code-of-conduct) - Community guidelines
+
+## 📦 Deployment
+
+Ready to deploy to production? Check out our comprehensive [Deployment Guide](DEPLOYMENT.md) for step-by-step instructions.
 
 ## 📞 Support
 
-If you encounter any issues or have questions, please open an issue in the repository.
+If you encounter any issues or have questions:
+
+- **Bug Reports**: Use our [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md)
+- **Feature Requests**: Use our [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md)
+- **Questions**: Open a [Discussion](https://github.com/zordhalo/beacon-ai/discussions) or issue
+
+## 📚 Additional Documentation
+
+- [Backend Architecture](backend/ARCHITECTURE.md) - Technical details of the backend
+- [Security Guidelines](SECURITY.md) - Security best practices
+- [Client Documentation](client/README.md) - Frontend-specific information
+- [GPT-5 Integration](GPT5-README.md) - GPT-5 feature documentation
