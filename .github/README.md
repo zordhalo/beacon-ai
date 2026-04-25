@@ -1,3 +1,17 @@
+# Beacon AI
+
+## Created By
+
+Beacon AI was developed by Ahmad Jowshan and Lucas.
+
+## Key Features
+
+- AI-powered mental wellness support
+- Personalized therapy-style conversations
+- User-friendly and responsive interface
+- Secure and scalable application structure
+
+---
 # GitHub Configuration
 
 This directory contains GitHub-specific configuration files for the Beacon AI repository.
