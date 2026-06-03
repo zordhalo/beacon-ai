@@ -87,3 +87,9 @@ Feel free to customize these templates to match your project's specific needs:
 - [GitHub Issue Templates Documentation](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/about-issue-and-pull-request-templates)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [CODEOWNERS Documentation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
+
+
+
+---
+
+<sub>Built by <a href="https://advancelabs.dev"><strong>Advance Labs Inc.</strong></a> — a software studio shipping <a href="https://www.creatin.ca">Creatin</a>, <a href="https://www.cartrix.live">Cartrix</a>, and <a href="https://github.com/Advance-Labs/aeo-toolkit">AEO Toolkit</a>.</sub>
