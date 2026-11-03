@@ -1,5 +1,7 @@
 # Beacon AI
 
+[![MCP servers live](https://whobuildsagents.com/badge/advancelabs.dev.svg)](https://whobuildsagents.com/advancelabs.dev)
+
 Beacon AI is a therapist chatbot application that uses artificial intelligence to help users with their mental health. The application provides an intuitive interface for users to chat with an AI therapist, manage their conversation history, and upload images for analysis.
 
 ## 🌟 Features
